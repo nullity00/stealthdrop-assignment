@@ -11,11 +11,18 @@ fn main(
   polynomial_commitment: pub Field,
   nullifier: pub [u8; 32],
 ) {
-  // Write your main logic here
+  let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
+  let address = ecrecover::ecrecover(key.pub_x, key.pub_y, signature, hashed_message);
+  assert(evaluate_polynomial(polynomial, address) == 0);
+  assert(std::hash::blake2s(signature) == nullifier);
 }
 
 fn evaluate_polynomial(polynomial: [Field; CANDIDATES + 1], x: Field) -> Field {
-  // Write logic to evaluate polynomial here
+  let mut product = 1;
+  for p in polynomial {
+    product = product * (x-p);
+  }  
+  product
 }
 
 #[test]
